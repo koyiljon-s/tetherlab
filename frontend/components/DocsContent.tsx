@@ -1,9 +1,14 @@
-export default function DocsContent() {
+type DocsContentProps = {
+  activeQuestion: string;
+};
+
+export default function DocsContent({ activeQuestion }: DocsContentProps) {
   return (
-    <main className="flex-1 p-10 bg-[#1c1c1c]">
-      <section id="what-is-tether" className="max-w-3xl">
-        <h1 className="mb-6 text-3xl font-bold text-white">What is Tether?</h1>
-        <div className="space-y-4 text-[17px] leading-relaxed text-[#bebfc4]">
+    <main className="flex-1 p-12">
+      {activeQuestion === "what-is-tether" ? (
+        <section id="what-is-tether" className="max-w-3xl">
+        <h1 className="mb-6 text-3xl font-bold text-[#1f1f1f]">What is Tether?</h1>
+        <div className="space-y-4 text-[17px] leading-relaxed text-[#4e5861]">
           <p>
             Tether (USDT) is a stablecoin — a type of cryptocurrency designed to maintain
             a stable value by pegging its price to a reserve asset, in this case the
@@ -24,7 +29,25 @@ export default function DocsContent() {
             many trading pairs on exchanges worldwide.
           </p>
         </div>
-      </section>
+        </section>
+      ) : (
+        <section id="why-coinbase-testnet-tools" className="max-w-3xl">
+        <h2 className="mb-6 text-3xl font-bold text-[#1f1f1f]">Why we used Coinbase tesnet tools</h2>
+        <div className="space-y-4 text-[17px] leading-relaxed text-[#4e5861]">
+          <p>
+            Coinbase testnet tools let students explore blockchain transfers in a safe,
+            low-risk environment. They can create wallets and submit test transactions
+            without using real money or interacting with a live production network.
+          </p>
+          <p>
+            TetherLab uses Base Sepolia and testnet USDC as a technical stand-in for
+            USDT where blockchain interaction is demonstrated. This makes it possible
+            to observe how addresses, transactions, and confirmations work while keeping
+            the lesson focused on stablecoin concepts.
+          </p>
+        </div>
+        </section>
+      )}
     </main>
   );
 }
