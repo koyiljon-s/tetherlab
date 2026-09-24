@@ -8,7 +8,7 @@ export default function DocsViewer() {
   const [activeQuestion, setActiveQuestion] = useState("what-is-tether");
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl">
+    <div className="mx-auto flex w-full max-w-384">
       <DocsSidebar activeQuestion={activeQuestion} onSelect={setActiveQuestion} />
       <DocsContent activeQuestion={activeQuestion} />
     </div>

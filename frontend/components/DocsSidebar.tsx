@@ -1,6 +1,6 @@
 const sidebarItems = [
   { id: "what-is-tether", label: "What is Tether?" },
-  { id: "why-coinbase-testnet-tools", label: "Why we used Coinbase tesnet tools" },
+  { id: "why-coinbase-testnet-tools", label: "Coinbase tesnet tools" },
 ];
 
 type DocsSidebarProps = {
@@ -11,15 +11,15 @@ type DocsSidebarProps = {
 export default function DocsSidebar({ activeQuestion, onSelect }: DocsSidebarProps) {
 
   return (
-    <aside className="w-58 shrink-0  border-[#2e2e2e] pt-12">
-      <nav className="flex flex-col gap-2">
+    <aside className="w-58 shrink-0 border-r border-[#ededed] px-6 pt-4">
+      <nav className="flex flex-col gap-1">
         {sidebarItems.map((item) => (
           <a
             key={item.id}
             href={`#${item.id}`}
             onClick={() => onSelect(item.id)}
             className={`flex items-center justify-between gap-2 rounded-md py-2 text-[17px] transition-colors ${
-              activeQuestion === item.id ? "text-[#1f1f1f] font-medium" : "text-[#1f1f1f]"
+              activeQuestion === item.id ? "text-[#e650bb] font-medium" : "text-[#1f1f1f]"
             }`}
           >
             {item.label}
