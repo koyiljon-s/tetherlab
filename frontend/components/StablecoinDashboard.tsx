@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { ChartColumnBig } from "lucide-react"
 import {
   type ChartConfig,
   ChartContainer,
@@ -22,7 +23,7 @@ type PriceData = { spots: SpotPrice[]; history: HistoryPoint[] };
 const chartConfig = {
   close: {
     label: "USDT Price",
-    color: "var(--chart-1)",
+    color: "#e650bb",
   },
 } satisfies ChartConfig;
 
@@ -69,10 +70,11 @@ export default function StablecoinDashboard() {
       {/* Left — Area Chart (70%) */}
       <div className="flex w-[70%] flex-col border border-zinc-200 bg-white p-5">
         <div className="mb-4">
-          <h3 className="text-sm font-semibold text-zinc-900">
+          <h3 className="flex items-center gap-2 text-lg font-semibold text-zinc-900">
+            <ChartColumnBig className="h-5 w-5" />
             USDT Price — Last 14 Days
           </h3>
-          <p className="text-xs text-zinc-500">
+          <p className="text-sm text-zinc-500">
             Daily close price ·{" "}
             <span
               className={delta >= 0 ? "text-emerald-600" : "text-red-500"}
@@ -85,7 +87,7 @@ export default function StablecoinDashboard() {
         </div>
         {data.history.length > 0 ? (
           <ChartContainer config={chartConfig} className="min-h-0 flex-1 w-full">
-            <AreaChart
+            <BarChart
               accessibilityLayer
               data={data.history}
               margin={{ top: 8, right: 8, bottom: 0, left: 0 }}
@@ -97,6 +99,7 @@ export default function StablecoinDashboard() {
                 axisLine={false}
                 tickFormatter={formatDate}
                 tick={{ fontSize: 12 }}
+                color="#7825f5"
                 interval="preserveStartEnd"
               />
               <YAxis
@@ -106,6 +109,7 @@ export default function StablecoinDashboard() {
                 tickFormatter={(v: number) => `$${v.toFixed(4)}`}
                 tick={{ fontSize: 12 }}
                 width={72}
+                
               />
               <ChartTooltip
                 content={
@@ -118,30 +122,12 @@ export default function StablecoinDashboard() {
                   />
                 }
               />
-              <defs>
-                <linearGradient id="fillClose" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="0%"
-                    stopColor="var(--color-close)"
-                    stopOpacity={0.15}
-                  />
-                  <stop
-                    offset="100%"
-                    stopColor="var(--color-close)"
-                    stopOpacity={0.02}
-                  />
-                </linearGradient>
-              </defs>
-              <Area
-                type="monotone"
+              <Bar
                 dataKey="close"
-                stroke="var(--color-close)"
-                strokeWidth={2}
-                fill="url(#fillClose)"
-                dot={false}
-                activeDot={{ r: 4, strokeWidth: 2, fill: "white" }}
+                fill="var(--color-close)"
+                radius={[4, 4, 0, 0]}
               />
-            </AreaChart>
+            </BarChart>
           </ChartContainer>
         ) : (
           <p className="flex flex-1 items-center justify-center text-sm text-zinc-400">
