@@ -1,6 +1,8 @@
 const sidebarItems = [
   { id: "what-is-tether", label: "What is Tether?" },
   { id: "why-coinbase-testnet-tools", label: "Coinbase tesnet tools" },
+  { id: "what-is-sandbox", label: "What is Sandbox?" },
+  { id: "what-is-playground", label: "What is Playground?" },
 ];
 
 type DocsSidebarProps = {
@@ -18,7 +20,7 @@ export default function DocsSidebar({ activeQuestion, onSelect }: DocsSidebarPro
             key={item.id}
             href={`#${item.id}`}
             onClick={() => onSelect(item.id)}
-            className={`flex items-center justify-between gap-2 rounded-md py-2 text-[17px] transition-colors ${
+            className={`flex items-center justify-between gap-2 rounded-md py-2 text-sm transition-colors ${
               activeQuestion === item.id ? "text-[#e650bb] font-medium" : "text-[#1f1f1f]"
             }`}
           >

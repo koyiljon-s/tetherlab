@@ -7,7 +7,7 @@ import { Home, FlaskConical, BarChart3, FileText, Hexagon } from "lucide-react";
 const navItems = [
   { label: "Home", href: "/", icon: Home },
   { label: "Playground", href: "/playground", icon: FlaskConical },
-  { label: "Usage", href: "/usage", icon: BarChart3 },
+  { label: "Sandbox", href: "/sandbox", icon: BarChart3 },
   { label: "Documentation", href: "/docs", icon: FileText },
 ];
 
