@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import DocsViewer from "@/components/DocsViewer";
+import Sidebar from "@/components/Sidebar";
 
 export default function Docs() {
   return (

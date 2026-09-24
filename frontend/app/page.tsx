@@ -1,11 +1,11 @@
-import Hero from "@/components/Hero";
-import Navbar from "@/components/Navbar";
+import Sidebar from "@/components/Sidebar";
+import HomePanel from "@/components/HomePanel";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 bg-zinc-50 font-sans dark:bg-black">
-      <Navbar />
-      <Hero />
+    <div className="flex flex-1 bg-zinc-50 font-sans dark:bg-black">
+      <Sidebar />
+      <HomePanel />
     </div>
   );
 }
