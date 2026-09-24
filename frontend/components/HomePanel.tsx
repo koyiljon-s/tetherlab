@@ -1,9 +1,12 @@
 import { ArrowUpRight } from "lucide-react";
+import StablecoinDashboard from "@/components/StablecoinDashboard";
 
 export default function HomePanel() {
   return (
     <div className="flex flex-1 flex-col bg-white">
-      <main className="flex-1" />
+      <main className="flex-1">
+        <StablecoinDashboard />
+      </main>
       <div className="flex justify-end px-6 py-3">
         <a
           href="mailto:buidl@koyiljon.com"
