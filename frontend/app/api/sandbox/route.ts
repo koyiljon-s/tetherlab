@@ -1,4 +1,4 @@
-import { createPublicClient, http, formatUnits } from "viem";
+import { createPublicClient, http, formatUnits, getAddress } from "viem";
 import { mainnet } from "viem/chains";
 
 const client = createPublicClient({
@@ -39,13 +39,34 @@ const erc20Abi = [
   },
 ] as const;
 
+const TOP_HOLDERS = [
+  { label: "Binance", address: "0xF977814e90dA44bFA03b6295A0616a897441aceC" },
+  { label: "Whale 1", address: "0x47ac0Fb4F2D84898e4D9E7b4DaB3C24507a6D503" },
+  { label: "Tether Treasury", address: "0x5754284f345afc66a98fbB0a0Afe71e0F007B949" },
+  { label: "Binance 2", address: "0x28C6c06298d514Db089934071355E5743bf21d60" },
+  { label: "Whale 2", address: "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d" },
+] as const;
+
 export async function GET() {
   try {
-    const [name, symbol, totalSupply] = await Promise.all([
+    const [name, symbol, totalSupply, ...holderBalances] = await Promise.all([
       client.readContract({ address: USDT_ADDRESS, abi: erc20Abi, functionName: "name" }),
       client.readContract({ address: USDT_ADDRESS, abi: erc20Abi, functionName: "symbol" }),
       client.readContract({ address: USDT_ADDRESS, abi: erc20Abi, functionName: "totalSupply" }),
+      ...TOP_HOLDERS.map((h) =>
+        client.readContract({
+          address: USDT_ADDRESS,
+          abi: erc20Abi,
+          functionName: "balanceOf",
+          args: [getAddress(h.address)],
+        }),
+      ),
     ]);
+
+    const holders = TOP_HOLDERS.map((h, i) => ({
+      label: h.label,
+      balance: Number(formatUnits(holderBalances[i], 6)),
+    }));
 
     return Response.json({
       name,
@@ -54,6 +75,7 @@ export async function GET() {
       network: "Ethereum Mainnet",
       decimals: 6,
       totalSupply: formatUnits(totalSupply, 6),
+      holders,
     });
   } catch (error) {
     console.error("Contract info error:", error);

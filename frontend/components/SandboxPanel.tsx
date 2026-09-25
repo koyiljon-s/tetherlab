@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Cell } from "recharts";
 import {
   BarChart3,
   Loader2,
@@ -8,6 +9,17 @@ import {
   Coins,
   ArrowRightLeft,
 } from "lucide-react";
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+
+type Holder = {
+  label: string;
+  balance: number;
+};
 
 type ContractInfo = {
   name: string;
@@ -16,7 +28,14 @@ type ContractInfo = {
   network: string;
   decimals: number;
   totalSupply: string;
+  holders: Holder[];
 };
+
+const HOLDER_COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"];
+
+const holderChartConfig = {
+  balance: { label: "USDT Balance" },
+} satisfies ChartConfig;
 
 type BalanceResult = {
   address: string;
@@ -128,34 +147,87 @@ export default function SandboxPanel() {
                 Loading contract data...
               </div>
             ) : contractInfo ? (
-              <div className="mt-4 border border-[#ededed] bg-[#f5f5f5] p-4">
+              <div className="mt-4 space-y-4">
+                {/* Stat tiles */}
                 <div className="flex gap-3">
-                  <div className="flex-1 rounded-lg border border-[#ededed] bg-white px-4 py-4 text-center">
-                    <div className="text-2xl font-semibold text-black">
+                  <div className="flex-1 border border-[#ededed] bg-[#7c68ed] px-4 py-4 text-center">
+                    <div className="text-2xl font-semibold text-white">
                       {formatSupply(contractInfo.totalSupply)}
                     </div>
-                    <div className="mt-1 text-xs font-medium text-zinc-400">
+                    <div className="mt-1 text-xs font-medium text-zinc-200">
                       Total Supply
                     </div>
                   </div>
-                  <div className="flex-1 rounded-lg border border-[#ededed] bg-white px-4 py-4 text-center">
-                    <div className="text-2xl font-semibold text-black">
+                  <div className="flex-1 border border-[#ededed] bg-[#3bb371] px-4 py-4 text-center">
+                    <div className="text-2xl font-semibold text-white">
                       {contractInfo.symbol}
                     </div>
-                    <div className="mt-1 text-xs font-medium text-zinc-400">
+                    <div className="mt-1 text-xs font-medium text-zinc-200">
                       Symbol
                     </div>
                   </div>
-                  <div className="flex-1 rounded-lg border border-[#ededed] bg-white px-4 py-4 text-center">
-                    <div className="text-2xl font-semibold text-black">
+                  <div className="flex-1 border border-[#ededed] bg-[#0088ff] px-4 py-4 text-center">
+                    <div className="text-2xl font-semibold text-white">
                       {contractInfo.network}
                     </div>
-                    <div className="mt-1 text-xs font-medium text-zinc-400">
+                    <div className="mt-1 text-xs font-medium text-zinc-200">
                       Network
                     </div>
                   </div>
                 </div>
-                <div className="mt-3 flex items-center justify-between text-[15px]">
+
+                {/* Top holders bar chart */}
+                {contractInfo.holders && contractInfo.holders.length > 0 && (
+                  <div className="border border-[#ededed] bg-[#f5f5f5] p-5">
+                    <h3 className="text-sm font-semibold text-zinc-900">
+                      Top USDT Holders (Ethereum)
+                    </h3>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      Real on-chain balances of major wallets
+                    </p>
+                    <ChartContainer config={holderChartConfig} className="mt-4 h-70 w-full">
+                      <BarChart
+                        data={contractInfo.holders}
+                        layout="vertical"
+                        margin={{ top: 0, right: 16, bottom: 0, left: 0 }}
+                      >
+                        <CartesianGrid horizontal={false} strokeDasharray="" />
+                        <YAxis
+                          dataKey="label"
+                          type="category"
+                          tickLine={false}
+                          axisLine={false}
+                          tick={{ fontSize: 13 }}
+                          width={110}
+                        />
+                        <XAxis
+                          type="number"
+                          tickLine={false}
+                          axisLine={false}
+                          tickFormatter={(v: number) => formatSupply(String(v))}
+                          tick={{ fontSize: 12 }}
+                        />
+                        <ChartTooltip
+                          content={
+                            <ChartTooltipContent
+                              formatter={(value) => [
+                                `$${Number(value).toLocaleString("en-US", { maximumFractionDigits: 0 })}`,
+                                "USDT",
+                              ]}
+                            />
+                          }
+                        />
+                        <Bar dataKey="balance" radius={[0, 4, 4, 0]}>
+                          {contractInfo.holders.map((_, i) => (
+                            <Cell key={i} fill={HOLDER_COLORS[i % HOLDER_COLORS.length]} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ChartContainer>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between border border-[#ededed] bg-[#f5f5f5] px-4 py-3 text-[15px]">
                   <span className="text-zinc-500">Contract</span>
                   <code className="rounded bg-white px-2 py-0.5 font-mono text-[14px] text-black">
                     {contractInfo.contract}
@@ -252,39 +324,42 @@ export default function SandboxPanel() {
               </button>
 
               {transfers && (
-                <div className="mt-4 border border-[#ededed] bg-[#f5f5f5] p-4">
-                  <div className="space-y-3">
-                    {transfers.map((t, i) => (
-                      <div
-                        key={`${t.txHash}-${i}`}
-                        className="flex items-center justify-between rounded-lg border border-[#ededed] bg-white px-4 py-3"
-                      >
-                        <div className="flex items-center gap-3 text-[14px]">
-                          <ArrowRightLeft size={14} className="text-zinc-400" />
-                          <div>
-                            <div className="flex items-center gap-1.5 text-zinc-700">
-                              <code className="font-mono text-black">
-                                {t.from.slice(0, 6)}...{t.from.slice(-4)}
-                              </code>
-                              <span className="text-zinc-400">&rarr;</span>
-                              <code className="font-mono text-black">
-                                {t.to.slice(0, 6)}...{t.to.slice(-4)}
-                              </code>
-                            </div>
-                            <div className="mt-0.5 text-[12px] text-zinc-400">
-                              Block {t.blockNumber.toLocaleString()}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-[15px] font-semibold text-black">
+                <div className="mt-4 overflow-hidden border border-[#ededed]">
+                  <table className="w-full text-[14px]">
+                    <thead>
+                      <tr className="bg-[#f5f5f5] text-left text-xs font-medium text-zinc-500">
+                        <th className="px-4 py-2.5">From</th>
+                        <th className="px-4 py-2.5">To</th>
+                        <th className="px-4 py-2.5 text-right">Amount</th>
+                        <th className="px-4 py-2.5 text-right">Block</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {transfers.map((t, i) => (
+                        <tr
+                          key={`${t.txHash}-${i}`}
+                          className="border-t border-[#ededed] bg-white"
+                        >
+                          <td className="px-4 py-2.5">
+                            <code className="font-mono text-black">
+                              {t.from.slice(0, 6)}...{t.from.slice(-4)}
+                            </code>
+                          </td>
+                          <td className="px-4 py-2.5">
+                            <code className="font-mono text-black">
+                              {t.to.slice(0, 6)}...{t.to.slice(-4)}
+                            </code>
+                          </td>
+                          <td className="px-4 py-2.5 text-right font-medium text-black">
                             ${Number(t.amount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </div>
-                          <div className="text-[11px] text-zinc-400">USDT</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                          </td>
+                          <td className="px-4 py-2.5 text-right text-zinc-500">
+                            {t.blockNumber.toLocaleString()}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
 
