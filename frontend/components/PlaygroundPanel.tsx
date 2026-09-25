@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Wallet, Loader2, CheckCircle2, AlertCircle, Copy } from "lucide-react";
+import { Wallet, Loader2, CheckCircle2, AlertCircle, Copy, FlaskConical, Droplets, ExternalLink, Search } from "lucide-react";
 
 type WalletInfo = {
   address: string;
@@ -14,6 +14,14 @@ export default function PlaygroundPanel() {
   const [creatingWallet, setCreatingWallet] = useState(false);
   const [walletError, setWalletError] = useState("");
   const [copied, setCopied] = useState(false);
+
+  const [funding, setFunding] = useState(false);
+  const [faucetTx, setFaucetTx] = useState<string | null>(null);
+  const [faucetError, setFaucetError] = useState("");
+
+  const [checkingBalance, setCheckingBalance] = useState(false);
+  const [balances, setBalances] = useState<{ asset: string; amount: string }[] | null>(null);
+  const [balanceError, setBalanceError] = useState("");
 
   async function createWallet() {
     setCreatingWallet(true);
@@ -30,6 +38,46 @@ export default function PlaygroundPanel() {
     }
   }
 
+  async function fundWallet() {
+    if (!wallet) return;
+    setFunding(true);
+    setFaucetError("");
+    try {
+      const res = await fetch("/api/faucet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: wallet.address }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setFaucetTx(data.transactionHash);
+    } catch (err: unknown) {
+      setFaucetError(err instanceof Error ? err.message : "Failed to fund wallet");
+    } finally {
+      setFunding(false);
+    }
+  }
+
+  async function checkBalance() {
+    if (!wallet) return;
+    setCheckingBalance(true);
+    setBalanceError("");
+    try {
+      const res = await fetch("/api/balance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: wallet.address }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setBalances(data.balances);
+    } catch (err: unknown) {
+      setBalanceError(err instanceof Error ? err.message : "Failed to check balance");
+    } finally {
+      setCheckingBalance(false);
+    }
+  }
+
   function copyAddress() {
     if (!wallet) return;
     navigator.clipboard.writeText(wallet.address);
@@ -39,12 +87,13 @@ export default function PlaygroundPanel() {
 
   return (
     <div className="flex flex-1 flex-col bg-white">
-      <header className="px-6 py-4 text-[15px] font-medium bg-[#f5f5f5] text-[#454545] border-b border-[#ededed]">
+      <header className="flex items-center gap-2 px-6 py-4 text-[15px] font-medium bg-[#f5f5f5] text-[#454545] border-b border-[#ededed]">
+        <FlaskConical size={16} strokeWidth={1.75} />
         Playground
       </header>
       <main className="flex-1 overflow-y-auto px-6 py-4">
         <div className="mx-auto max-w-6xl">
-          <section className="mt-8">
+          <section className="mt-4">
             <div className="flex items-center gap-1">
               <span className="flex h-6 w-10 items-center justify-center text-[16px] font-bold text-black">
                 01/
@@ -90,7 +139,7 @@ export default function PlaygroundPanel() {
                         <Copy size={14} />
                       </button>
                       {copied && (
-                        <span className="text-xs text-emerald-600">Copied!</span>
+                        <span className="text-xs text-[#010101]">Copied!</span>
                       )}
                     </div>
                   </div>
@@ -108,6 +157,137 @@ export default function PlaygroundPanel() {
                 {walletError}
               </div>
             )}
+          </section>
+
+          <section className="mt-8">
+            <div className="flex items-center gap-1">
+              <span
+                className={`flex h-6 w-10 items-center justify-center text-[16px] font-bold ${
+                  wallet ? "text-black" : "text-zinc-300"
+                }`}
+              >
+                02/
+              </span>
+              <h2
+                className={`text-base font-semibold ${wallet ? "text-black" : "text-zinc-400"}`}
+              >
+                Fund Your Wallet
+              </h2>
+            </div>
+            <p className="mt-2 text-sm leading-relaxed text-zinc-500">
+              Request free testnet ETH from a faucet. This is test currency with no
+              real value — perfect for learning how transactions work.
+            </p>
+
+            <div className={`mt-4 ${!wallet ? "pointer-events-none opacity-40" : ""}`}>
+              {!faucetTx ? (
+                <button
+                  onClick={fundWallet}
+                  disabled={funding || !wallet}
+                  className="inline-flex items-center gap-2 bg-[#2664eb] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#1d4ed8] disabled:opacity-60"
+                >
+                  {funding ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <Droplets size={16} />
+                  )}
+                  {funding ? "Requesting..." : "Request Testnet ETH"}
+                </button>
+              ) : (
+                <div className="border border-[#ededed] bg-[#f5f5f5] p-4">
+                  <div className="flex items-center gap-2 text-[15px] font-medium text-[#2362eb]">
+                    <CheckCircle2 size={16} />
+                    Funds Received
+                  </div>
+                  <div className="mt-3 text-[15px]">
+                    <div className="flex items-center justify-between">
+                      <span className="text-zinc-500">Transaction</span>
+                      <a
+                        href={`https://sepolia.basescan.org/tx/${faucetTx}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[14px] font-medium text-[#2664eb] hover:underline"
+                      >
+                        View on BaseScan
+                        <ExternalLink size={12} />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {faucetError && (
+                <div className="mt-3 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                  <AlertCircle size={14} />
+                  {faucetError}
+                </div>
+              )}
+            </div>
+          </section>
+          <section className="mt-8">
+            <div className="flex items-center gap-1">
+              <span
+                className={`flex h-6 w-10 items-center justify-center text-[16px] font-bold ${
+                  faucetTx ? "text-black" : "text-zinc-300"
+                }`}
+              >
+                03/
+              </span>
+              <h2
+                className={`text-base font-semibold ${faucetTx ? "text-black" : "text-zinc-400"}`}
+              >
+                Check Balance
+              </h2>
+            </div>
+            <p className="mt-2 text-sm leading-relaxed text-zinc-500">
+              Query the blockchain to see what tokens your wallet holds.
+              This reads directly from the network — no database involved.
+            </p>
+
+            <div className={`mt-4 ${!faucetTx ? "pointer-events-none opacity-40" : ""}`}>
+              <button
+                onClick={checkBalance}
+                disabled={checkingBalance || !faucetTx}
+                className="inline-flex items-center gap-2 bg-[#2664eb] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#1d4ed8] disabled:opacity-60"
+              >
+                {checkingBalance ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <Search size={16} />
+                )}
+                {checkingBalance ? "Checking..." : "Check Balance"}
+              </button>
+
+              {balances && (
+                <div className="mt-4 border border-[#ededed] bg-[#f5f5f5] p-4">
+                  <div className="flex items-center gap-2 text-[15px] font-medium text-[#2362eb]">
+                    <CheckCircle2 size={16} />
+                    Wallet Balances
+                  </div>
+                  <div className="mt-3 space-y-2 text-[15px]">
+                    {balances.length === 0 ? (
+                      <span className="text-zinc-500">No balances found</span>
+                    ) : (
+                      balances.map((b) => (
+                        <div key={b.asset} className="flex items-center justify-between">
+                          <span className="text-zinc-500 uppercase">{b.asset}</span>
+                          <code className="rounded bg-white px-2 py-0.5 font-mono text-[14px] text-black">
+                            {b.amount}
+                          </code>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {balanceError && (
+                <div className="mt-3 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                  <AlertCircle size={14} />
+                  {balanceError}
+                </div>
+              )}
+            </div>
           </section>
         </div>
       </main>
