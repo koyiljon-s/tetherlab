@@ -175,8 +175,8 @@ export default function PlaygroundPanel() {
               </h2>
             </div>
             <p className="mt-2 text-sm leading-relaxed text-zinc-500">
-              Request free testnet ETH from a faucet. This is test currency with no
-              real value — perfect for learning how transactions work.
+              Request free testnet USDC from a faucet. This is test currency with no
+              real value — perfect for learning how stablecoins work.
             </p>
 
             <div className={`mt-4 ${!wallet ? "pointer-events-none opacity-40" : ""}`}>
@@ -191,7 +191,7 @@ export default function PlaygroundPanel() {
                   ) : (
                     <Droplets size={16} />
                   )}
-                  {funding ? "Requesting..." : "Request Testnet ETH"}
+                  {funding ? "Requesting..." : "Request Testnet USDC"}
                 </button>
               ) : (
                 <div className="border border-[#ededed] bg-[#f5f5f5] p-4">
@@ -264,20 +264,36 @@ export default function PlaygroundPanel() {
                     <CheckCircle2 size={16} />
                     Wallet Balances
                   </div>
-                  <div className="mt-3 space-y-2 text-[15px]">
-                    {balances.length === 0 ? (
-                      <span className="text-zinc-500">No balances found</span>
-                    ) : (
-                      balances.map((b) => (
-                        <div key={b.asset} className="flex items-center justify-between">
-                          <span className="text-zinc-500 uppercase">{b.asset}</span>
-                          <code className="rounded bg-white px-2 py-0.5 font-mono text-[14px] text-black">
-                            {b.amount}
-                          </code>
-                        </div>
-                      ))
-                    )}
-                  </div>
+                  {balances.length === 0 ? (
+                    <span className="mt-3 block text-sm text-zinc-500">No balances found</span>
+                  ) : (
+                    <div className="mt-4 flex gap-3">
+                      {balances.map((b) => {
+                        const isStable = b.asset.toLowerCase() === "usdc";
+                        const display = isStable
+                          ? `$${Number(b.amount).toFixed(2)}`
+                          : `${b.amount}`;
+                        return (
+                          <div
+                            key={b.asset}
+                            className="flex-1 rounded-lg border border-[#ededed] bg-white px-4 py-4 text-center"
+                          >
+                            <div className="text-2xl font-semibold text-black">
+                              {display}
+                            </div>
+                            <div className="mt-1 text-xs font-medium uppercase text-zinc-400">
+                              {b.asset}
+                            </div>
+                            {isStable && (
+                              <div className="mt-2 text-[11px] text-zinc-400">
+                                1 USDC = $1.00 USD
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
 

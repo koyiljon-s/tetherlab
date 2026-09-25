@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     const resp = await Coinbase.apiClients.externalAddress!.requestExternalFaucetFunds(
       Coinbase.networks.BaseSepolia,
       address,
-      "eth",
+      "usdc",
     );
 
     const tx = resp.data;
