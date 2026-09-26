@@ -16,7 +16,7 @@ const STABLECOINS = [
 async function fetchSpotPrice(coin: string) {
   const res = await fetch(
     `https://api.coinbase.com/v2/prices/${coin}-USD/spot`,
-    { next: { revalidate: 60 } }
+    { cache: "no-store" }
   );
   if (!res.ok) return null;
   const data = await res.json();
@@ -36,7 +36,7 @@ async function fetchCandles(productId: string, days: number) {
         end: end.toISOString(),
       }),
     {
-      next: { revalidate: 300 },
+      cache: "no-store",
       headers: { "User-Agent": "TetherLab/1.0" },
     }
   );
