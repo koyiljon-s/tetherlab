@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 const STABLECOINS = [
   "USDT",
   "USDC",
@@ -28,31 +30,46 @@ async function fetchCandles(productId: string, days: number) {
   const start = new Date();
   start.setDate(end.getDate() - days);
 
-  const res = await fetch(
+  const urls = [
     `https://api.exchange.coinbase.com/products/${productId}/candles?` +
       new URLSearchParams({
         granularity: "86400",
         start: start.toISOString(),
         end: end.toISOString(),
       }),
-    {
-      cache: "no-store",
-      headers: { "User-Agent": "TetherLab/1.0" },
-    }
-  );
-  if (!res.ok) return [];
-  const candles: [number, number, number, number, number, number][] =
-    await res.json();
+    `https://api.pro.coinbase.com/products/${productId}/candles?` +
+      new URLSearchParams({
+        granularity: "86400",
+        start: start.toISOString(),
+        end: end.toISOString(),
+      }),
+  ];
 
-  return candles
-    .map(([time, low, high, open, close]) => ({
-      date: new Date(time * 1000).toISOString().split("T")[0],
-      open,
-      high,
-      low,
-      close,
-    }))
-    .reverse();
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, {
+        cache: "no-store",
+        headers: { "User-Agent": "TetherLab/1.0" },
+      });
+      if (!res.ok) continue;
+      const candles: [number, number, number, number, number, number][] =
+        await res.json();
+      if (!candles.length) continue;
+
+      return candles
+        .map(([time, low, high, open, close]) => ({
+          date: new Date(time * 1000).toISOString().split("T")[0],
+          open,
+          high,
+          low,
+          close,
+        }))
+        .reverse();
+    } catch {
+      continue;
+    }
+  }
+  return [];
 }
 
 export async function GET() {
