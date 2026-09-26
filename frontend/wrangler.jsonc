@@ -1,5 +1,5 @@
 {
-  "name": "stablecoin-scaleworks",
+  "name": "stablecoin",
   "compatibility_flags": ["nodejs_compat"],
   "compatibility_date": "2025-12-01",
   "assets": {
