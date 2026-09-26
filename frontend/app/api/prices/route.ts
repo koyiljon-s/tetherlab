@@ -35,7 +35,10 @@ async function fetchCandles(productId: string, days: number) {
         start: start.toISOString(),
         end: end.toISOString(),
       }),
-    { next: { revalidate: 300 } }
+    {
+      next: { revalidate: 300 },
+      headers: { "User-Agent": "TetherLab/1.0" },
+    }
   );
   if (!res.ok) return [];
   const candles: [number, number, number, number, number, number][] =
