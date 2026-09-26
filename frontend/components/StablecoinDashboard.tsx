@@ -20,6 +20,31 @@ type HistoryPoint = {
 };
 type PriceData = { spots: SpotPrice[]; history: HistoryPoint[] };
 
+async function fetchCandlesClient(productId: string, days: number): Promise<HistoryPoint[]> {
+  const end = new Date();
+  const start = new Date();
+  start.setDate(end.getDate() - days);
+  const params = new URLSearchParams({
+    granularity: "86400",
+    start: start.toISOString(),
+    end: end.toISOString(),
+  });
+  const res = await fetch(
+    `https://api.exchange.coinbase.com/products/${productId}/candles?${params}`
+  );
+  if (!res.ok) return [];
+  const candles: [number, number, number, number, number, number][] = await res.json();
+  return candles
+    .map(([time, low, high, open, close]) => ({
+      date: new Date(time * 1000).toISOString().split("T")[0],
+      open,
+      high,
+      low,
+      close,
+    }))
+    .reverse();
+}
+
 const chartConfig = {
   close: {
     label: "USDT Price",
@@ -37,11 +62,20 @@ export default function StablecoinDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/prices")
-      .then((r) => r.json())
-      .then(setData)
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    async function load() {
+      try {
+        const [pricesRes, historyData] = await Promise.all([
+          fetch("/api/prices").then((r) => r.json()),
+          fetchCandlesClient("USDT-USD", 14),
+        ]);
+        setData({ spots: pricesRes.spots, history: historyData });
+      } catch {
+        // ignore
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
   }, []);
 
   if (loading) {

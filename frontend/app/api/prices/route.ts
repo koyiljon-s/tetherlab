@@ -25,61 +25,10 @@ async function fetchSpotPrice(coin: string) {
   return { coin, price: parseFloat(data.data.amount) };
 }
 
-async function fetchCandles(productId: string, days: number) {
-  const end = new Date();
-  const start = new Date();
-  start.setDate(end.getDate() - days);
-
-  const urls = [
-    `https://api.exchange.coinbase.com/products/${productId}/candles?` +
-      new URLSearchParams({
-        granularity: "86400",
-        start: start.toISOString(),
-        end: end.toISOString(),
-      }),
-    `https://api.pro.coinbase.com/products/${productId}/candles?` +
-      new URLSearchParams({
-        granularity: "86400",
-        start: start.toISOString(),
-        end: end.toISOString(),
-      }),
-  ];
-
-  for (const url of urls) {
-    try {
-      const res = await fetch(url, {
-        cache: "no-store",
-        headers: { "User-Agent": "TetherLab/1.0" },
-      });
-      if (!res.ok) continue;
-      const candles: [number, number, number, number, number, number][] =
-        await res.json();
-      if (!candles.length) continue;
-
-      return candles
-        .map(([time, low, high, open, close]) => ({
-          date: new Date(time * 1000).toISOString().split("T")[0],
-          open,
-          high,
-          low,
-          close,
-        }))
-        .reverse();
-    } catch {
-      continue;
-    }
-  }
-  return [];
-}
-
 export async function GET() {
-  const [spots, usdtHistory] = await Promise.all([
-    Promise.all(STABLECOINS.map(fetchSpotPrice)),
-    fetchCandles("USDT-USD", 14),
-  ]);
+  const spots = await Promise.all(STABLECOINS.map(fetchSpotPrice));
 
   return NextResponse.json({
     spots: spots.filter(Boolean),
-    history: usdtHistory,
   });
 }
