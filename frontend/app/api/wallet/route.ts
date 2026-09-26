@@ -1,13 +1,16 @@
 import { Coinbase, createSmartWallet } from "@coinbase/coinbase-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 
-new Coinbase({
-  apiKeyName: process.env.CDP_API_KEY_ID!,
-  privateKey: process.env.CDP_API_KEY_SECRET!.replace(/\\n/g, "\n"),
-});
+function initCoinbase() {
+  new Coinbase({
+    apiKeyName: process.env.CDP_API_KEY_ID!,
+    privateKey: process.env.CDP_API_KEY_SECRET!.replace(/\\n/g, "\n"),
+  });
+}
 
 export async function POST() {
   try {
+    initCoinbase();
     const privateKey = generatePrivateKey();
     const owner = privateKeyToAccount(privateKey);
 

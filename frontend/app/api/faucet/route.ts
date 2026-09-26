@@ -1,12 +1,15 @@
 import { Coinbase } from "@coinbase/coinbase-sdk";
 
-new Coinbase({
-  apiKeyName: process.env.CDP_API_KEY_ID!,
-  privateKey: process.env.CDP_API_KEY_SECRET!.replace(/\\n/g, "\n"),
-});
+function initCoinbase() {
+  new Coinbase({
+    apiKeyName: process.env.CDP_API_KEY_ID!,
+    privateKey: process.env.CDP_API_KEY_SECRET!.replace(/\\n/g, "\n"),
+  });
+}
 
 export async function POST(request: Request) {
   try {
+    initCoinbase();
     const { address } = await request.json();
 
     if (!address) {
