@@ -100,9 +100,9 @@ export default function StablecoinDashboard() {
   const deltaSign = delta >= 0 ? "+" : "";
 
   return (
-    <div className="flex h-full gap-6 p-6">
-      {/* Left — Area Chart (70%) */}
-      <div className="flex w-[70%] flex-col border border-zinc-200 bg-white p-5">
+    <div className="flex h-full flex-col gap-6 p-4 pt-14 md:flex-row md:p-6 md:pt-6">
+      {/* Left — Area Chart */}
+      <div className="flex min-h-[300px] flex-col border border-zinc-200 bg-white p-4 md:w-[70%] md:p-5">
         <div className="mb-4">
           <h3 className="flex items-center gap-2 text-lg font-semibold text-zinc-900">
             <ChartColumnBig className="h-5 w-5" />
@@ -170,8 +170,8 @@ export default function StablecoinDashboard() {
         )}
       </div>
 
-      {/* Right — Stablecoins Table (30%) */}
-      <div className="flex w-[30%] flex-col border border-zinc-200 bg-[#f5f5f5] p-5">
+      {/* Right — Stablecoins Table */}
+      <div className="flex flex-col border border-zinc-200 bg-[#f5f5f5] p-4 md:w-[30%] md:p-5">
         <h3 className="mb-4 text-sm font-semibold text-zinc-900">
           Stablecoin Prices
         </h3>

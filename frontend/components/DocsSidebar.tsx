@@ -13,7 +13,7 @@ type DocsSidebarProps = {
 export default function DocsSidebar({ activeQuestion, onSelect }: DocsSidebarProps) {
 
   return (
-    <aside className="w-58 shrink-0 border-r border-[#ededed] px-6 pt-4">
+    <aside className="w-full shrink-0 border-b border-[#ededed] px-4 pt-4 md:w-58 md:border-b-0 md:border-r md:px-6">
       <nav className="flex flex-col gap-1">
         {sidebarItems.map((item) => (
           <a

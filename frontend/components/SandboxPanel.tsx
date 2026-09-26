@@ -121,11 +121,11 @@ export default function SandboxPanel() {
 
   return (
     <div className="flex flex-1 flex-col bg-white">
-      <header className="flex items-center gap-2 px-6 py-4 text-[15px] font-medium bg-[#f5f5f5] text-[#454545] border-b border-[#ededed]">
+      <header className="mt-12 flex items-center gap-2 px-4 py-4 text-[15px] font-medium bg-[#f5f5f5] text-[#454545] border-b border-[#ededed] md:mt-0 md:px-6">
         <BarChart3 size={16} strokeWidth={1.75} />
         Sandbox
       </header>
-      <main className="flex-1 overflow-y-auto px-6 py-4">
+      <main className="flex-1 overflow-y-auto px-4 py-4 md:px-6">
         <div className="mx-auto max-w-6xl">
 
           {/* USDT Contract Info */}
@@ -149,7 +149,7 @@ export default function SandboxPanel() {
             ) : contractInfo ? (
               <div className="mt-4 space-y-4">
                 {/* Stat tiles */}
-                <div className="flex gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row">
                   <div className="flex-1 border border-[#ededed] bg-[#7c68ed] px-4 py-4 text-center">
                     <div className="text-2xl font-semibold text-white">
                       {formatSupply(contractInfo.totalSupply)}
@@ -227,9 +227,9 @@ export default function SandboxPanel() {
                   </div>
                 )}
 
-                <div className="flex items-center justify-between border border-[#ededed] bg-[#f5f5f5] px-4 py-3 text-[15px]">
+                <div className="flex flex-col gap-1 border border-[#ededed] bg-[#f5f5f5] px-4 py-3 text-[15px] sm:flex-row sm:items-center sm:justify-between">
                   <span className="text-zinc-500">Contract</span>
-                  <code className="rounded bg-white px-2 py-0.5 font-mono text-[14px] text-black">
+                  <code className="break-all rounded bg-white px-2 py-0.5 font-mono text-[14px] text-black">
                     {contractInfo.contract}
                   </code>
                 </div>
@@ -250,7 +250,7 @@ export default function SandboxPanel() {
               This reads real data from the blockchain — try a known address like an exchange wallet.
             </p>
 
-            <div className="mt-4 flex gap-2">
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
               <input
                 type="text"
                 value={address}
@@ -324,8 +324,8 @@ export default function SandboxPanel() {
               </button>
 
               {transfers && (
-                <div className="mt-4 overflow-hidden border border-[#ededed]">
-                  <table className="w-full text-[14px]">
+                <div className="mt-4 overflow-x-auto border border-[#ededed]">
+                  <table className="w-full min-w-[500px] text-[14px]">
                     <thead>
                       <tr className="bg-[#f5f5f5] text-left text-xs font-medium text-zinc-500">
                         <th className="px-4 py-2.5">From</th>

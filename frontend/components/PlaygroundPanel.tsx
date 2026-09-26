@@ -87,11 +87,11 @@ export default function PlaygroundPanel() {
 
   return (
     <div className="flex flex-1 flex-col bg-white">
-      <header className="flex items-center gap-2 px-6 py-4 text-[15px] font-medium bg-[#f5f5f5] text-[#454545] border-b border-[#ededed]">
+      <header className="mt-12 flex items-center gap-2 px-4 py-4 text-[15px] font-medium bg-[#f5f5f5] text-[#454545] border-b border-[#ededed] md:mt-0 md:px-6">
         <FlaskConical size={16} strokeWidth={1.75} />
         Playground
       </header>
-      <main className="flex-1 overflow-y-auto px-6 py-4">
+      <main className="flex-1 overflow-y-auto px-4 py-4 md:px-6">
         <div className="mx-auto max-w-6xl">
           <section className="mt-4">
             <div className="flex items-center gap-1">
@@ -125,10 +125,10 @@ export default function PlaygroundPanel() {
                   Wallet Created
                 </div>
                 <div className="mt-3 space-y-2 text-[15px]">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                     <span className="text-zinc-500">Address</span>
                     <div className="flex items-center gap-1.5">
-                      <code className="rounded bg-white px-2 py-0.5 font-mono text-[14px] text-black">
+                      <code className="truncate rounded bg-white px-2 py-0.5 font-mono text-[14px] text-black max-w-[200px] sm:max-w-none">
                         {wallet.address}
                       </code>
                       <button
